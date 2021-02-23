@@ -1,28 +1,43 @@
-let answer = document.getElementById('answer');
-let attempt = document.getElementById('attempt');
+let answerInput = document.getElementById('answer');
+let attemptDiv = document.getElementById('attempt');
+let answer = Math.floor(Math.random()*10000);
+let ansStr = answer.toString();
+let attempt = 0;
+let guess = document.getElementById('guessing-div');
+let replay = document.getElementById('replay-div');
+let code = document.getElementById('code');
 
-function guess() {
+function guessNum() {
     let input = document.getElementById('user-guess');
     //add functionality to guess function here
 
-    if(answer || attempt == ''){
+    if(answerInput || attemptDiv == ''){
       setHiddenFields();
     }
     if(validateInput(input.value)){
-      attempt=attempt++;
+      attempt++;
     }else{
       return false;
     }
+    if(getResults(input.value)){
+      setMessage('You Win!');
+      showAnswer(true);
+      showReplay();
+    }else if (attempt>10) {
+      setMessage('You lose!');
+      showAnswer(false);
+      showReplay();
+    }else{
+      setMessage('Incorrect, try again');
+    };
+
 }
 
 //implement new functions here
 function setHiddenFields(){
-  let answer = Math.floor(Math.random()*10000);
-  let ansStr = answer.toString();
   while (ansStr.length<4){
     ansStr = '0' + ansStr;
   };
-  let attempt = 0;
   return ansStr;
 }
 
@@ -30,7 +45,7 @@ function setMessage(msg){
   document.getElementById('message').innerHTML = msg;
 }
 
-validateInput(param){
+function validateInput(param){
   if(param.length = 4){
     return true;
   }else{
@@ -39,6 +54,39 @@ validateInput(param){
   }
 }
 
-getResults(param){
-  document.getElementById('results').innerHTML = '<div class="row"><span class="col-md-6">'+param+'</span><div class="col-md-6">'
+function getResults(param){
+  document.getElementById('results').insertAdjacentHTML('beforeend','<div class="row"><span class="col-md-6">'+param+'</span><div class="col-md-6">');
+  let paramArray = param.split('');
+  let ansArray = ansStr.split('');
+  let correct = 0;
+  for(var i=0;i<ansArray.length;i++){
+    if(ansArray.includes(paramArray[i])){
+      if(ansArray[i]===paramArray[i]){
+        document.getElementById('results').insertAdjacentHTML('beforeend','<span class="glyphicon glyphicon-ok"></span>');
+        correct++;
+      }else{
+        document.getElementById('results').insertAdjacentHTML('beforeend','<span class="glyphicon glyphicon-transfer"></span>');
+      }
+    }else{
+      document.getElementById('results').insertAdjacentHTML('beforeend','<span class="glyphicon glyphicon-remove"></span>');
+    }
+  }
+  document.getElementById('results').insertAdjacentHTML('beforeend','</div></div>');
+  if(correct===4){
+    return true;
+  }else{
+    return false;
+  }
+}
+function showAnswer(boo){
+  code.innerHTML = '<strong>'+ansStr+'</strong>';
+  if(boo){
+    code.className += ' success';
+  }else{
+    code.className += ' failure';
+  }
+}
+function showReplay(){
+  guess.style.display = 'none';
+  replay.style.display = 'block';
 }
